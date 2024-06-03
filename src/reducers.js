@@ -14,7 +14,7 @@ export const { selectAll, selectById, selectIds, selectEntities, selectTotal } =
   items.getSelectors((state) => state.items);
 
 export const init = {
-  items: items.getInitialState({ data: [], id: null }),
+  items: items.getInitialState({ id: null, entities: {}, ids: [] }),
   data: { loading: false, error: null, data: null },
 };
 
@@ -43,7 +43,7 @@ const itemsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(editing, (state, action) => {
-        state.data[action.payload.id] = action.payload;
+        state.entities[action.payload.id] = action.payload;
       })
       .addMatcher(
         //(action) => action.type.endsWith("DEFAULT"),
