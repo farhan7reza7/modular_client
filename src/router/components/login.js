@@ -6,7 +6,7 @@ import { useAuth } from "../authContext";
 const LogIn = () => {
   const { login } = useAuth();
   const handleSubmit = useCallback(
-    (values, formik) => {
+    async (values, formik) => {
       formik.setSubmitting(true);
       formik.setStatus("Processing...");
       try {
@@ -14,7 +14,7 @@ const LogIn = () => {
           alert(JSON.stringify(values, null, 2));
           formik.setSubmitting(false);
           formik.resetForm();
-          login();
+          login(values);
         }, 500);
       } catch {
         formik.setStatus("error in submitting form");
@@ -24,9 +24,9 @@ const LogIn = () => {
   );
 
   const formik = useFormik({
-    initialValues: { user: "", password: "" },
+    initialValues: { username: "", password: "" },
     validationSchema: Yup.object().shape({
-      user: Yup.string().required("Required field"),
+      username: Yup.string().required("Required field"),
       password: Yup.string().required("Required field"),
     }),
     onSubmit: handleSubmit,
@@ -37,14 +37,14 @@ const LogIn = () => {
       <form onSubmit={formik.handleSubmit}>
         <label htmlFor="user">Username</label>
         <input
-          name="user"
+          name="username"
           type="text"
           id="user"
-          value={formik.values.user}
+          value={formik.values.username}
           onChange={formik.handleChange}
         />
-        {formik.touched.user && formik.errors.user ? (
-          <div>{formik.errors.user}</div>
+        {formik.touched.username && formik.errors.username ? (
+          <div>{formik.errors.username}</div>
         ) : (
           ""
         )}

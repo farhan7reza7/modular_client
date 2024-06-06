@@ -6,12 +6,12 @@ const Register = () => {
   const { register } = useAuth();
 
   const formik = useFormik({
-    initialValues: { user: "", password: "" },
+    initialValues: { username: "", password: "" },
     validationSchema: Yup.object().shape({
-      user: Yup.string().required("Required field"),
+      username: Yup.string().required("Required field"),
       password: Yup.string().required("Required field"),
     }),
-    onSubmit: register,
+    onSubmit: (values, formik) => register(values),
   });
 
   return (
@@ -19,14 +19,14 @@ const Register = () => {
       <form onSubmit={formik.handleSubmit}>
         <label htmlFor="user">Username</label>
         <input
-          name="user"
-          value={formik.values.user}
+          name="username"
+          value={formik.values.username}
           type="text"
           id="user"
           onChange={formik.handleChange}
         />
-        {formik.errors.user && formik.touched.user && (
-          <div>{formik.errors.user}</div>
+        {formik.errors.username && formik.touched.username && (
+          <div>{formik.errors.username}</div>
         )}
         <label htmlFor="pass">Password</label>
         <input
