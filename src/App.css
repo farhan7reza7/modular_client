@@ -21,3 +21,43 @@
 .App-link {
   color: #61dafb;
 }
+
+.component {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #61dafb;
+}
+.navBased {
+  min-height: 100vh;
+  background-color: #61dafb;
+}
+
+.navMain {
+  height: 50px;
+  background-color: aliceblue;
+}
+
+.navMain ul {
+  list-style: none;
+}
+
+.navMain ul li {
+  display: inline-block;
+  padding-right: 25px;
+}
+
+.navMain ul li > * {
+  margin: 15px;
+}
+
+label,
+input[type="submit"] {
+  display: block;
+}
+
+input[type="submit"] {
+  padding: 5px;
+  margin: 10px auto;
+}

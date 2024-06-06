@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { adder, editer, deleter, updater, selectAll } from "./reducers";
 import { editing, dataFetcher } from "./actions";
+import AppRoutes from "./router/appRoutes";
+import AppNavBar from "./router/appNavbar";
 
 function App() {
   const ref1 = useSpringRef();
@@ -112,6 +114,10 @@ const items = useSelector(itemsSelector);*/
   };
   return (
     <div className="App">
+      <div className="navBased">
+        <AppNavBar />
+        <AppRoutes />
+      </div>
       <div className="reduxTD">
         <input
           type="text"
