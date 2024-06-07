@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [invalidL, setInvalidL] = useState(false);
   const [invalidR, setInvalidR] = useState(false);
   const [userId, setUser] = useState("");
+  const [token, setToken] = useState("");
 
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
             setInvalidL(false);
             setUser(data.userId);
+            setToken(data.token);
             navigate("../");
           } else {
             setInvalidL(true);
@@ -37,6 +39,7 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     setIsAuthenticated(false);
     setUser("");
+    setToken("");
     //navigate("../login");
   }, []);
 
@@ -55,6 +58,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
             setInvalidR(false);
             setUser(data.userId);
+            setToken(data.token);
             navigate("../");
           } else {
             setInvalidR(true);
@@ -74,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         register,
+        token,
       }}
     >
       {children}

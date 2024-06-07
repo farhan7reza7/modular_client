@@ -11,13 +11,13 @@ const LogIn = () => {
       formik.setSubmitting(true);
       formik.setStatus("Processing...");
       try {
-        setTimeout(() => {
+        /*  setTimeout(() => {
           alert(JSON.stringify(values, null, 2));
-          //formik.resetForm();
-          login(values);
-          formik.setStatus("");
-          formik.setSubmitting(false);
-        }, 500);
+          //formik.resetForm();*/
+        login(values);
+        formik.setStatus("");
+        formik.setSubmitting(false);
+        //}, 500);
       } catch {
         formik.setStatus("error in submitting form");
       }

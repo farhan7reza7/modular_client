@@ -3,29 +3,39 @@ import { useAuth } from "../authContext";
 import { useCallback, useEffect, useState } from "react";
 
 const Home = () => {
-  const { userId } = useAuth();
+  const { userId, token } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    fetch(`/api/tasks?userId=${userId}`)
+    fetch(`/api/tasks?userId=${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setTasks(data))
       .catch((error) => {
         console.log(error.message);
       });
-  }, [userId]);
+  }, [userId, token]);
 
   const handleAdd = useCallback(() => {
     fetch("/api/task", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ content: input, userId: userId }),
     })
       .then((res) => {
-        fetch(`/api/tasks?userId=${userId}`, { method: "GET" })
+        fetch(`/api/tasks?userId=${userId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
           .then((res) => res.json())
           .then((data) => setTasks(data))
           .catch((error) => {
@@ -36,7 +46,7 @@ const Home = () => {
       .catch((error) => {
         console.log(error.message);
       });
-  }, [input, userId]);
+  }, [input, userId, token]);
 
   return (
     <>
