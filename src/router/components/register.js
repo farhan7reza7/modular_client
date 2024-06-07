@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useAuth } from "../authContext";
 
 const Register = () => {
-  const { register } = useAuth();
+  const { register, invalidR } = useAuth();
 
   const formik = useFormik({
     initialValues: { username: "", password: "" },
@@ -24,6 +24,7 @@ const Register = () => {
           type="text"
           id="user"
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
         {formik.errors.username && formik.touched.username && (
           <div>{formik.errors.username}</div>
@@ -35,11 +36,13 @@ const Register = () => {
           type="password"
           id="pass"
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
         {formik.errors.password && formik.touched.password && (
           <div>{formik.errors.password}</div>
         )}
-        <input type="submit" value="Register" />
+        <input type="submit" value="Register" disabled={formik.isSubmitting} />
+        {invalidR && <div>Username already taken</div>}
       </form>
     </div>
   );

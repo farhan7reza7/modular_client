@@ -4,6 +4,10 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [invalidL, setInvalidL] = useState(false);
+  const [invalidR, setInvalidR] = useState(false);
+  const [userId, setUser] = useState("");
+
   const navigate = useNavigate();
 
   const login = useCallback(
@@ -19,7 +23,11 @@ export const AuthProvider = ({ children }) => {
         .then((data) => {
           if (data.valid) {
             setIsAuthenticated(true);
+            setInvalidL(false);
+            setUser(data.userId);
             navigate("../");
+          } else {
+            setInvalidL(true);
           }
         });
     },
@@ -28,6 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(() => {
     setIsAuthenticated(false);
+    setUser("");
     //navigate("../login");
   }, []);
 
@@ -44,7 +53,11 @@ export const AuthProvider = ({ children }) => {
         .then((data) => {
           if (data.valid) {
             setIsAuthenticated(true);
+            setInvalidR(false);
+            setUser(data.userId);
             navigate("../");
+          } else {
+            setInvalidR(true);
           }
         });
     },
@@ -52,7 +65,17 @@ export const AuthProvider = ({ children }) => {
   );
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, register }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        invalidL,
+        userId,
+        invalidR,
+        login,
+        logout,
+        register,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
