@@ -1,11 +1,12 @@
+import { useEffect } from "react";
 import { useAuth } from "../authContext";
 
 const LogOut = () => {
   const { logout } = useAuth();
-  logout();
-
+  useEffect(() => {
+    logout();
+  }, [logout]);
   return <div className="component">LogOut Page</div>;
-  // return <button onClick={logout}>up</button>;
 };
 
 export default LogOut;

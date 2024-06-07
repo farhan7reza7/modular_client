@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
@@ -8,6 +14,16 @@ export const AuthProvider = ({ children }) => {
   const [invalidR, setInvalidR] = useState(false);
   const [userId, setUser] = useState("");
   const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("token"));
+    const id = JSON.parse(localStorage.getItem("userId"));
+    if (token) {
+      setIsAuthenticated(true);
+      setUser(id);
+      setToken(token);
+    }
+  }, []);
 
   const navigate = useNavigate();
 
@@ -27,6 +43,8 @@ export const AuthProvider = ({ children }) => {
             setInvalidL(false);
             setUser(data.userId);
             setToken(data.token);
+            localStorage.setItem("token", JSON.stringify(data.token));
+            localStorage.setItem("userId", JSON.stringify(data.userId));
             navigate("../");
           } else {
             setInvalidL(true);
@@ -36,10 +54,12 @@ export const AuthProvider = ({ children }) => {
     [navigate]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     setIsAuthenticated(false);
     setUser("");
     setToken("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     //navigate("../login");
   }, []);
 
@@ -59,6 +79,8 @@ export const AuthProvider = ({ children }) => {
             setInvalidR(false);
             setUser(data.userId);
             setToken(data.token);
+            localStorage.setItem("token", JSON.stringify(data.token));
+            localStorage.setItem("userId", JSON.stringify(data.userId));
             navigate("../");
           } else {
             setInvalidR(true);
