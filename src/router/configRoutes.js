@@ -7,6 +7,9 @@ const Register = lazy(() => import("./components/register"));
 const Details = lazy(() => import("./components/details"));
 const About = lazy(() => import("./components/about"));
 const User = lazy(() => import("./components/users"));
+const Forget = lazy(() => import("./components/forget"));
+const Reset = lazy(() => import("./components/reset"));
+const NotFound = lazy(() => import("./components/notfound"));
 
 const configRoutes = [
   {
@@ -21,6 +24,9 @@ const configRoutes = [
   { path: "/login", element: <LogIn /> },
   { path: "/logout", element: <LogOut /> },
   { path: "/register", element: <Register /> },
+  { path: "/forget", element: <Forget /> },
+  { path: "/reset", element: <Reset /> },
+  { path: "*", element: <NotFound /> },
 ];
 
 export default configRoutes;

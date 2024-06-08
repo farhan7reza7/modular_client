@@ -2,10 +2,12 @@ import { useFormik } from "formik";
 import { useCallback, useState } from "react";
 import * as Yup from "yup";
 import { useAuth } from "../authContext";
+import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
   const [check, setCheck] = useState(false);
   const { login, invalidL } = useAuth();
+  const navigate = useNavigate();
   const handleSubmit = useCallback(
     async (values, formik) => {
       formik.setSubmitting(true);
@@ -74,7 +76,15 @@ const LogIn = () => {
         {formik.isValidating && <div>Validating...</div>}
         {!formik.isValid && check ? <div>Not Valid Form...</div> : ""}
         <div>{formik.status}</div>
-        {invalidL && <div>Please fill correct details, and then submit</div>}
+        {invalidL && (
+          <div>
+            <p>Please fill correct details, and then submit</p>
+            <br />
+            <button type="button" onClick={() => navigate("../forget")}>
+              Forget password
+            </button>
+          </div>
+        )}
       </form>
     </div>
   );

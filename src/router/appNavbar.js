@@ -5,14 +5,6 @@ const AppNavBar = () => {
   return (
     <nav className="navMain">
       <ul>
-        <li>
-          <NavLink
-            to="/"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            Home
-          </NavLink>
-        </li>
         {!isAuthenticated ? (
           <>
             <li>
@@ -33,14 +25,24 @@ const AppNavBar = () => {
             </li>{" "}
           </>
         ) : (
-          <li>
-            <NavLink
-              className={({ isActive }) => (isActive ? "active" : "")}
-              to="/logout"
-            >
-              Log out
-            </NavLink>
-          </li>
+          <>
+            <li>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                className={({ isActive }) => (isActive ? "active" : "")}
+                to="/logout"
+              >
+                Log out
+              </NavLink>
+            </li>
+          </>
         )}
       </ul>
     </nav>

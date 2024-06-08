@@ -14,14 +14,15 @@ export const AuthProvider = ({ children }) => {
   const [invalidR, setInvalidR] = useState(false);
   const [userId, setUser] = useState("");
   const [token, setToken] = useState("");
+  const [re, setRe] = useState(false);
 
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("token"));
+    const tokenz = JSON.parse(localStorage.getItem("token"));
     const id = JSON.parse(localStorage.getItem("userId"));
-    if (token) {
+    if (tokenz) {
       setIsAuthenticated(true);
       setUser(id);
-      setToken(token);
+      setToken(tokenz);
     }
   }, []);
 
@@ -60,7 +61,6 @@ export const AuthProvider = ({ children }) => {
     setToken("");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
-    //navigate("../login");
   }, []);
 
   const register = useCallback(
@@ -90,6 +90,56 @@ export const AuthProvider = ({ children }) => {
     [navigate]
   );
 
+  const forget = useCallback(
+    async (details) => {
+      fetch("/api/forget", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(details),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            setUser(data.userId);
+            setToken(data.token);
+            localStorage.setItem("token", JSON.stringify(data.token));
+            localStorage.setItem("userId", JSON.stringify(data.userId));
+            setRe(true);
+            navigate("../reset");
+          }
+        });
+    },
+    [navigate]
+  );
+
+  const reset = useCallback(
+    async (details) => {
+      fetch("/api/reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(details),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            setIsAuthenticated(false);
+            setUser("");
+            setToken("");
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            setRe(false);
+            navigate("../login");
+          }
+        });
+    },
+    [navigate, token]
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -101,6 +151,9 @@ export const AuthProvider = ({ children }) => {
         logout,
         register,
         token,
+        forget,
+        reset,
+        re,
       }}
     >
       {children}

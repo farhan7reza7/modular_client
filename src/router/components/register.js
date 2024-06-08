@@ -10,6 +10,7 @@ const Register = () => {
     validationSchema: Yup.object().shape({
       username: Yup.string().required("Required field"),
       password: Yup.string().required("Required field"),
+      email: Yup.string().email("not email type").required("Required field"),
     }),
     onSubmit: (values, formik) => register(values),
   });
@@ -29,6 +30,19 @@ const Register = () => {
         {formik.errors.username && formik.touched.username && (
           <div>{formik.errors.username}</div>
         )}
+        <label htmlFor="email">Email</label>
+        <input
+          name="email"
+          value={formik.values.email}
+          type="email"
+          id="email"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+        />
+        {formik.errors.email && formik.touched.email && (
+          <div>{formik.errors.email}</div>
+        )}
+
         <label htmlFor="pass">Password</label>
         <input
           name="password"
