@@ -3,8 +3,7 @@ import * as Yup from "yup";
 import { useAuth } from "../authContext";
 
 const Forget = () => {
-  const { forget } = useAuth();
-
+  const { forget, messageF, invalidF } = useAuth();
   const formik = useFormik({
     initialValues: { username: "", email: "" },
     validationSchema: Yup.object().shape({
@@ -48,6 +47,8 @@ const Forget = () => {
             <div>{formik.errors.email}</div>
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
+          <div>{messageF}</div>
+          {invalidF && !messageF && <div>Please enter correct details</div>}
         </form>
       </div>
     </div>

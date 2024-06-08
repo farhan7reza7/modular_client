@@ -1,16 +1,21 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../authContext";
+import { useLocation } from "react-router-dom";
 
 const Reset = () => {
-  const { reset, token, userId } = useAuth();
-
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const token = query.get("token");
+  const userId = query.get("userId");
+  const { reset, invalidRP, messageRP } = useAuth();
   const formik = useFormik({
     initialValues: { password: "" },
     validationSchema: Yup.object().shape({
       password: Yup.string().required("Required field"),
     }),
-    onSubmit: (values, formik) => reset({ password: values.password, userId }),
+    onSubmit: (values, formik) =>
+      reset({ password: values.password, userId, token }),
   });
 
   return (
@@ -31,6 +36,8 @@ const Reset = () => {
             <div>{formik.errors.password}</div>
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
+          <div>{messageRP}</div>
+          {invalidRP && !messageRP && <div>Please enter correct details</div>}
         </form>
       </div>
     </div>
