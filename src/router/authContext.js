@@ -10,7 +10,9 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    JSON.parse(localStorage.getItem("ve")) ? true : false
+  );
   const [invalidL, setInvalidL] = useState(false);
   const [invalidR, setInvalidR] = useState(false);
   const [invalidF, setInvalidF] = useState(false);
@@ -19,52 +21,59 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUser] = useState("");
   const [token, setToken] = useState("");
   const [re, setRe] = useState(false);
+
   const [messageF, setMessageF] = useState("");
+  const [messageL, setMessageL] = useState("");
   const [messageRP, setMessageRP] = useState("");
+  const [messageE, setMessageE] = useState("");
 
   useEffect(() => {
-    const tokenz = JSON.parse(localStorage.getItem("token"));
-    const id = JSON.parse(localStorage.getItem("userId"));
-    if (tokenz) {
-      const reS = JSON.parse(localStorage.getItem("re"));
-      if (reS) {
-        setRe(reS);
-      } else {
-        setIsAuthenticated(true);
-        setUser(id);
-        setToken(tokenz);
+    try {
+      const tokenz = JSON.parse(localStorage.getItem("token"));
+      const id = JSON.parse(localStorage.getItem("userId"));
+      if (tokenz) {
+        const reS = JSON.parse(localStorage.getItem("re"));
+        if (reS) {
+          setRe(reS);
+        } else {
+          setIsAuthenticated(true);
+          setUser(id);
+          setToken(tokenz);
+        }
       }
+    } catch (error) {
+      localStorage.clear();
     }
   }, []);
 
   const navigate = useNavigate();
 
-  const login = useCallback(
-    async (details) => {
-      fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(details),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.valid) {
-            setIsAuthenticated(true);
-            setInvalidL(false);
-            setUser(data.userId);
-            setToken(data.token);
-            localStorage.setItem("token", JSON.stringify(data.token));
-            localStorage.setItem("userId", JSON.stringify(data.userId));
-            navigate("../");
-          } else {
-            setInvalidL(true);
-          }
-        });
-    },
-    [navigate]
-  );
+  const login = useCallback(async (details) => {
+    fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(details),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.valid) {
+          // setIsAuthenticated(true);
+          setInvalidL(false);
+          setMessageL(data.message);
+          setUser(data.userId);
+          setToken(data.token);
+          localStorage.setItem("ve", JSON.stringify(true));
+          localStorage.setItem("token", JSON.stringify(data.token));
+          localStorage.setItem("userId", JSON.stringify(data.userId));
+          //navigate("../");
+        } else {
+          setInvalidL(true);
+          setMessageL(data.message);
+        }
+      });
+  }, []);
 
   const logout = useCallback(async () => {
     setIsAuthenticated(false);
@@ -72,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     setToken("");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("ve");
   }, []);
 
   const register = useCallback(
@@ -127,6 +137,23 @@ export const AuthProvider = ({ children }) => {
       });
   }, []);
 
+  const verifyEmail = useCallback(async (details) => {
+    fetch("/api/verify-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(details),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setMessageE(data.message);
+      })
+      .catch((error) => {
+        setMessageE(error.message);
+      });
+  }, []);
+
   const reset = useCallback(
     async (details) => {
       fetch("/api/reset", {
@@ -174,9 +201,12 @@ export const AuthProvider = ({ children }) => {
         token,
         forget,
         reset,
+        messageL,
         re,
         messageF,
+        messageE,
         messageRP,
+        verifyEmail,
       }}
     >
       {children}

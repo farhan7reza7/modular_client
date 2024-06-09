@@ -37,7 +37,7 @@ const Reset = () => {
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
           <div>{messageRP}</div>
-          {invalidRP && !messageRP && <div>Please enter correct details</div>}
+          {invalidRP && !messageRP && <div>Please enter correct details!</div>}
         </form>
       </div>
     </div>

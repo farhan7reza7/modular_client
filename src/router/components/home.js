@@ -1,11 +1,18 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../authContext";
 import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
-  const { userId, token } = useAuth();
+  //  const { userId, token } = useAuth();
+  //const { messageL } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const [token] = useState(query.get("token"));
+  const [userId] = useState(query.get("userId"));
 
   useEffect(() => {
     fetch(`/api/tasks?userId=${userId}`, {

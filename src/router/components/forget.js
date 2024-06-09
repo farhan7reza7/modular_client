@@ -48,7 +48,7 @@ const Forget = () => {
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
           <div>{messageF}</div>
-          {invalidF && !messageF && <div>Please enter correct details</div>}
+          {invalidF && !messageF && <div>Please enter correct details!</div>}
         </form>
       </div>
     </div>

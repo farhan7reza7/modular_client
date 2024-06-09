@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useAuth } from "../authContext";
 
 const Register = () => {
-  const { register, invalidR } = useAuth();
+  const { register, invalidR, verifyEmail, messageE } = useAuth();
 
   const formik = useFormik({
     initialValues: { username: "", password: "" },
@@ -39,6 +39,17 @@ const Register = () => {
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
+        {!formik.errors.email && formik.touched.email && (
+          <>
+            <button
+              type="button"
+              onClick={() => verifyEmail({ email: formik.values.email })}
+            >
+              Verify email
+            </button>
+            <div>{messageE}</div>
+          </>
+        )}
         {formik.errors.email && formik.touched.email && (
           <div>{formik.errors.email}</div>
         )}
