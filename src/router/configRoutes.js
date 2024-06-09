@@ -10,6 +10,7 @@ const User = lazy(() => import("./components/users"));
 const Forget = lazy(() => import("./components/forget"));
 const Reset = lazy(() => import("./components/reset"));
 const NotFound = lazy(() => import("./components/notfound"));
+const Otp = lazy(() => import("./components/otp"));
 
 const configRoutes = [
   {
@@ -26,6 +27,8 @@ const configRoutes = [
   { path: "/register", element: <Register /> },
   { path: "/forget", element: <Forget /> },
   { path: "/reset", element: <Reset /> },
+  { path: "/otp", element: <Otp /> },
+
   { path: "*", element: <NotFound /> },
 ];
 

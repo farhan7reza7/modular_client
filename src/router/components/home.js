@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const Home = () => {
-  const { userId, token } = useAuth();
+  const { userId, token, user } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
 
@@ -79,6 +79,8 @@ const Home = () => {
       <div className="component">
         Home page
         <div>
+          <p>user id: {userId}</p>
+          <p>user: {user}</p>
           <h3>Tasks</h3>
           {tasks.map((el, index) => (
             <div key={el._id}>{el.content}</div>

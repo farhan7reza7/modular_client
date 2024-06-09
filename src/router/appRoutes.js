@@ -12,6 +12,7 @@ const AppRoutes = () => {
     "/register",
     "/user/:id",
     "/forget",
+    "/otp",
     re ? "/reset" : null,
   ];
   const routes = configRoutes.map((el, i) => {

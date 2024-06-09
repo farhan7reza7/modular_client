@@ -24,15 +24,16 @@ export const AuthProvider = ({ children }) => {
   const [invalidF, setInvalidF] = useState(false);
   const [invalidRP, setInvalidRP] = useState(false);
 
+  const [user, setUs] = useState("");
   const [userId, setUser] = useState("");
   const [token, setToken] = useState("");
-
   const [re, setRe] = useState(false);
 
   const [messageF, setMessageF] = useState("");
   const [messageL, setMessageL] = useState("");
   const [messageRP, setMessageRP] = useState("");
   const [messageE, setMessageE] = useState("");
+  const [messageM, setMessageM] = useState("");
 
   useEffect(() => {
     try {
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       localStorage.clear();
     }
-  }, []);
+  }, [query]);
 
   const navigate = useNavigate();
 
@@ -108,16 +109,60 @@ export const AuthProvider = ({ children }) => {
         .then((res) => res.json())
         .then((data) => {
           if (data.valid) {
-            setIsAuthenticated(true);
+            //setIsAuthenticated(true);
             setInvalidR(false);
-            setUser(data.userId);
-            setToken(data.token);
-            localStorage.setItem("token", JSON.stringify(data.token));
-            localStorage.setItem("userId", JSON.stringify(data.userId));
-            navigate("../");
+            setMessageM(data.message);
+            localStorage.setItem("ve", JSON.stringify(true));
+
+            //setUser(data.userId);
+            //setToken(data.token);
+            //localStorage.setItem("token", JSON.stringify(data.token));
+            //localStorage.setItem("userId", JSON.stringify(data.userId));
+            navigate(
+              `../otp?token=${data.token}&username=${data.username}&password=${data.password}&email=${data.email}`
+            );
           } else {
             setInvalidR(true);
           }
+        });
+    },
+    [navigate]
+  );
+
+  const verifyMfa = useCallback(
+    async (details) => {
+      fetch("/api/verify-mfa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(details),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          //setMessageE(data.message);
+          if (data.valid) {
+            console.log("valid working");
+            setIsAuthenticated(true);
+            setToken(data.token);
+            setUser(data.userId);
+            setUs(data.user);
+            localStorage.setItem("token", JSON.stringify(data.token));
+            localStorage.setItem("userId", JSON.stringify(data.userId));
+            //setMessageM(data.message);
+            /*navigate({
+              pathname: "../",
+              search: `?token=${data.token}&userId=${data.userId}`,
+            });*/
+            //navigate(`../?token=${data.token}&userId=${data.userId}`);
+            navigate("../");
+          } else {
+            setMessageM(data.message);
+            console.log("valid not working");
+          }
+        })
+        .catch((error) => {
+          setMessageM(error.message);
         });
     },
     [navigate]
@@ -219,6 +264,9 @@ export const AuthProvider = ({ children }) => {
         messageE,
         messageRP,
         verifyEmail,
+        verifyMfa,
+        messageM,
+        user,
       }}
     >
       {children}
