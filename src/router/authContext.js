@@ -3,16 +3,22 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    JSON.parse(localStorage.getItem("ve")) ? true : false
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const location = useLocation();
+  const query = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
   );
+
   const [invalidL, setInvalidL] = useState(false);
   const [invalidR, setInvalidR] = useState(false);
   const [invalidF, setInvalidF] = useState(false);
@@ -20,6 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   const [userId, setUser] = useState("");
   const [token, setToken] = useState("");
+
   const [re, setRe] = useState(false);
 
   const [messageF, setMessageF] = useState("");
@@ -31,6 +38,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const tokenz = JSON.parse(localStorage.getItem("token"));
       const id = JSON.parse(localStorage.getItem("userId"));
+
       if (tokenz) {
         const reS = JSON.parse(localStorage.getItem("re"));
         if (reS) {
@@ -39,6 +47,14 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
           setUser(id);
           setToken(tokenz);
+        }
+      } else {
+        const tokens = query.get("token");
+        const userIds = query.get("userId");
+        if (JSON.parse(localStorage.getItem("ve")) && tokens && userIds) {
+          setIsAuthenticated(true);
+          setToken(tokens);
+          setUser(userIds);
         }
       }
     } catch (error) {
@@ -59,15 +75,11 @@ export const AuthProvider = ({ children }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) {
-          // setIsAuthenticated(true);
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
           setInvalidL(false);
           setMessageL(data.message);
-          setUser(data.userId);
-          setToken(data.token);
           localStorage.setItem("ve", JSON.stringify(true));
-          localStorage.setItem("token", JSON.stringify(data.token));
-          localStorage.setItem("userId", JSON.stringify(data.userId));
-          //navigate("../");
         } else {
           setInvalidL(true);
           setMessageL(data.message);
