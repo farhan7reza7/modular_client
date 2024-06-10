@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (!isAuthenticated) {
       try {
-        //handle data retainity on refresh
         const tokenz = JSON.parse(localStorage.getItem("token"));
         const id = JSON.parse(localStorage.getItem("userId"));
 
@@ -55,7 +54,6 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("logOutOnlyReset");
           localStorage.removeItem("logInner");
         } else {
-          //handle refresh on logged on for logging in through redirecting
           const tokens = query.get("token");
           const userIds = query.get("userId");
 
