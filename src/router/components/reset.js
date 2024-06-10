@@ -10,7 +10,7 @@ const Reset = () => {
   const token = query.get("token");
   const userId = query.get("userId");
 
-  const { reset, invalidRP, messageRP } = useAuth();
+  const { reset, invalidResetPassword, messageResetPassword } = useAuth();
   const formik = useFormik({
     initialValues: { password: "" },
     validationSchema: Yup.object().shape({
@@ -38,8 +38,10 @@ const Reset = () => {
             <div>{formik.errors.password}</div>
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
-          <div>{messageRP}</div>
-          {invalidRP && !messageRP && <div>Please enter correct details!</div>}
+          <div>{messageResetPassword}</div>
+          {invalidResetPassword && !messageResetPassword && (
+            <div>Please enter correct details!</div>
+          )}
         </form>
       </div>
     </div>

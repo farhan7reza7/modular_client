@@ -18,8 +18,16 @@ const Home = () => {
     const tn = query.get("token");
     const ur = query.get("userId");
     if (tn && ur) {
-      localStorage.setItem("token", JSON.stringify(tn));
-      localStorage.setItem("userId", JSON.stringify(ur));
+      fetch(`/api/verify-user?token=${tn}&userId=${ur}`, {
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.valid) {
+            localStorage.setItem("token", JSON.stringify(data.token));
+            localStorage.setItem("userId", JSON.stringify(ur));
+          }
+        });
     }
   }, []);
 
@@ -30,7 +38,9 @@ const Home = () => {
       },
     })
       .then((res) => res.json())
-      .then((data) => setTasks(data))
+      .then((data) => {
+        data.tasks && setTasks(data.tasks);
+      })
       .catch((error) => {
         console.log(error.message);
       });
@@ -53,7 +63,9 @@ const Home = () => {
           },
         })
           .then((res) => res.json())
-          .then((data) => setTasks(data))
+          .then((data) => {
+            data.tasks && setTasks(data.tasks);
+          })
           .catch((error) => {
             console.log(error.message);
           });

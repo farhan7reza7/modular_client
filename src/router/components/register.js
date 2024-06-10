@@ -3,7 +3,7 @@ import * as Yup from "yup";
 import { useAuth } from "../authContext";
 
 const Register = () => {
-  const { register, invalidR, verifyEmail, messageE } = useAuth();
+  const { register, invalidRegister, verifyEmail, messageEmail } = useAuth();
 
   const formik = useFormik({
     initialValues: { username: "", password: "" },
@@ -47,7 +47,7 @@ const Register = () => {
             >
               Verify email
             </button>
-            <div>{messageE}</div>
+            <div>{messageEmail}</div>
           </>
         )}
         {formik.errors.email && formik.touched.email && (
@@ -67,7 +67,7 @@ const Register = () => {
           <div>{formik.errors.password}</div>
         )}
         <input type="submit" value="Register" disabled={formik.isSubmitting} />
-        {invalidR && <div>Username already taken</div>}
+        {invalidRegister && <div>Username already taken</div>}
       </form>
     </div>
   );

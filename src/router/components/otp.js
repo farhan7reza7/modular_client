@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../authContext";
 import { useLocation } from "react-router-dom";
+import Register from "./register";
 
 const Otp = () => {
   const location = useLocation();
@@ -11,7 +12,7 @@ const Otp = () => {
   const password = query.get("password");
   const email = query.get("email");
 
-  const { verifyMfa, messageM } = useAuth();
+  const { verifyMfa, messageMfa, invalidMfa, register } = useAuth();
   const formik = useFormik({
     initialValues: { otp: "" },
     validationSchema: Yup.object().shape({
@@ -39,7 +40,19 @@ const Otp = () => {
             <div>{formik.errors.otp}</div>
           )}
           <input type="submit" value="Submit" disabled={formik.isSubmitting} />
-          <div>{messageM}</div>
+          <div>{messageMfa}</div>
+          {invalidMfa &&
+            (messageMfa === "otp expired, please generate new otp" ||
+              messageMfa === "please enter correct otp") && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => register({ username, password, email })}
+                >
+                  Regenerate otp
+                </button>
+              </div>
+            )}
         </form>
       </div>
     </div>

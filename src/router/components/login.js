@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const LogIn = () => {
   const [check, setCheck] = useState(false);
-  const { login, invalidL, messageL } = useAuth();
+  const { login, invalidLogin, messageLogin } = useAuth();
   const navigate = useNavigate();
   const handleSubmit = useCallback(
     async (values, formik) => {
@@ -72,10 +72,9 @@ const LogIn = () => {
         {formik.isValidating && <div>Validating...</div>}
         {!formik.isValid && check ? <div>Not Valid Form...</div> : ""}
         <div>{formik.status}</div>
-        <div>{messageL}</div>
-        {invalidL && (
+        <div>{messageLogin}</div>
+        {invalidLogin && (
           <div>
-            <br />
             <button type="button" onClick={() => navigate("../forget")}>
               Forget password
             </button>

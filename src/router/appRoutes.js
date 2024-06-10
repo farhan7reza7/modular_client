@@ -5,13 +5,13 @@ import ProtectedRoutes, { RedirectRoutes } from "./protectedRoutes";
 import { useAuth } from "./authContext";
 
 const AppRoutes = () => {
-  const { logOutOnlyReset, logOutOnlyOtp } = useAuth();
+  const { logOutOnlyReset, logOutOnlyOtp, isAuthenticated } = useAuth();
   const notProtect = [
     "/login",
     "/logout",
     "/register",
     "/user/:id",
-    "/forget",
+    isAuthenticated ? null : "/forget",
     "*",
     logOutOnlyOtp ? "/otp" : null,
     logOutOnlyReset ? "/reset" : null,
@@ -33,7 +33,7 @@ const AppRoutes = () => {
         );
       }
 
-      if (el.path !== "/reset" && el.path !== "/otp") {
+      if (el.path !== "/reset" && el.path !== "/otp" && el.path !== "/forget") {
         return (
           <Route
             path={el.path}

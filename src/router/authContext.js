@@ -25,24 +25,26 @@ export const AuthProvider = ({ children }) => {
   const [logOutOnlyReset, setLogOutOnlyReset] = useState(false);
   const [logOutOnlyOtp, setLogOutOnlyOtp] = useState(false);
 
-  const [invalidL, setInvalidL] = useState(false);
-  const [invalidR, setInvalidR] = useState(false);
-  const [invalidF, setInvalidF] = useState(false);
-  const [invalidRP, setInvalidRP] = useState(false);
-  //const [invalidE, setInvalidE] = useState(false);
+  const [invalidLogin, setInvalidLogin] = useState(false);
+  const [invalidRegister, setInvalidRegister] = useState(false);
+  const [invalidForget, setInvalidForget] = useState(false);
+  const [invalidResetPassword, setInvalidResetPassword] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
+  const [invalidMfa, setInvalidMfa] = useState(false);
 
-  const [messageF, setMessageF] = useState("");
-  const [messageL, setMessageL] = useState("");
-  const [messageRP, setMessageRP] = useState("");
-  const [messageE, setMessageE] = useState("");
-  const [messageM, setMessageM] = useState("");
-  const [messageR, setMessageR] = useState("");
+  const [messageForget, setMessageForget] = useState("");
+  const [messageLogin, setMessageLogin] = useState("");
+  const [messageResetPassword, setMessageResetPassword] = useState("");
+  const [messageEmail, setMessageEmail] = useState("");
+  const [messageMfa, setMessageMfa] = useState("");
+  const [messageRegister, setMessageRegister] = useState("");
 
   useEffect(() => {
     try {
       //handle data retainity on refresh
       const tokenz = JSON.parse(localStorage.getItem("token"));
       const id = JSON.parse(localStorage.getItem("userId"));
+
       if (tokenz && id) {
         setIsAuthenticated(true);
         setUserId(id);
@@ -55,14 +57,23 @@ export const AuthProvider = ({ children }) => {
         //handle refresh on logged on for logging in through redirecting
         const tokens = query.get("token");
         const userIds = query.get("userId");
+
         if (JSON.parse(localStorage.getItem("logInner")) && tokens && userIds) {
-          setIsAuthenticated(true);
-          setToken(tokens);
-          setUserId(userIds);
-          setLogOutOnlyOtp(false);
-          localStorage.removeItem("logInner");
-          setLogOutOnlyReset(false);
-          localStorage.removeItem("logOutOnlyReset");
+          fetch(`/api/verify-user?token=${tokens}&userId=${userIds}`, {
+            method: "GET",
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.valid) {
+                setIsAuthenticated(true);
+                setToken(data.token);
+                setUserId(userIds);
+                setLogOutOnlyOtp(false);
+                localStorage.removeItem("logInner");
+                setLogOutOnlyReset(false);
+                localStorage.removeItem("logOutOnlyReset");
+              }
+            });
         } else {
           if (JSON.parse(localStorage.getItem("logInner"))) {
             setLogOutOnlyOtp(true);
@@ -91,17 +102,17 @@ export const AuthProvider = ({ children }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) {
-          setInvalidL(false);
-          setMessageL(data.message);
+          setInvalidLogin(false);
+          setMessageLogin(data.message);
           setLogOutOnlyOtp(true);
           localStorage.setItem("logInner", JSON.stringify(true));
         } else {
-          setInvalidL(true);
-          setMessageL(data.message);
+          setInvalidLogin(true);
+          setMessageLogin(data.message);
         }
       })
       .catch((error) => {
-        setMessageL(error.message);
+        setMessageLogin(error.message);
       });
   }, []);
 
@@ -125,20 +136,20 @@ export const AuthProvider = ({ children }) => {
         .then((res) => res.json())
         .then((data) => {
           if (data.valid) {
-            setInvalidR(false);
-            setMessageM(data.message);
+            setInvalidRegister(false);
+            setMessageMfa(data.message);
             setLogOutOnlyOtp(true);
             localStorage.setItem("logInner", JSON.stringify(true));
             navigate(
               `../otp?token=${data.token}&username=${data.username}&password=${data.password}&email=${data.email}`
             );
           } else {
-            setInvalidR(true);
-            setMessageR(data.message);
+            setInvalidRegister(true);
+            setMessageRegister(data.message);
           }
         })
         .catch((error) => {
-          setMessageR(error.message);
+          setMessageRegister(error.message);
         });
     },
     [navigate]
@@ -160,6 +171,7 @@ export const AuthProvider = ({ children }) => {
             setToken(data.token);
             setUserId(data.userId);
             setUser(data.user);
+            setInvalidMfa(false);
             setLogOutOnlyReset(false);
             setLogOutOnlyOtp(false);
             localStorage.setItem("token", JSON.stringify(data.token));
@@ -167,11 +179,12 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem("logInner");
             navigate("../");
           } else {
-            setMessageM(data.message);
+            setMessageMfa(data.message);
+            setInvalidMfa(true);
           }
         })
         .catch((error) => {
-          setMessageM(error.message);
+          setMessageMfa(error.message);
         });
     },
     [navigate]
@@ -188,17 +201,17 @@ export const AuthProvider = ({ children }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) {
-          setMessageF(data.message);
-          setInvalidF(false);
+          setMessageForget(data.message);
+          setInvalidForget(false);
           setLogOutOnlyReset(true);
           localStorage.setItem("logOutOnlyReset", JSON.stringify(true));
         } else {
-          setInvalidF(true);
-          setMessageF(data.message);
+          setInvalidForget(true);
+          setMessageForget(data.message);
         }
       })
       .catch((error) => {
-        setMessageF(error.message);
+        setMessageForget(error.message);
       });
   }, []);
 
@@ -212,10 +225,12 @@ export const AuthProvider = ({ children }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setMessageE(data.message);
+        setMessageEmail(data.message);
+        setInvalidEmail(false);
       })
       .catch((error) => {
-        setMessageE(error.message);
+        setMessageEmail(error.message);
+        setInvalidEmail(true);
       });
   }, []);
 
@@ -232,19 +247,18 @@ export const AuthProvider = ({ children }) => {
         .then((res) => res.json())
         .then((data) => {
           if (data.valid) {
-            setMessageRP(data.message);
-            //setIsAuthenticated(false);
+            setMessageResetPassword(data.message);
             setUserId("");
             setToken("");
             setLogOutOnlyReset(false);
-            setInvalidRP(false);
+            setInvalidResetPassword(false);
             localStorage.removeItem("token");
             localStorage.removeItem("userId");
             localStorage.removeItem("logOutOnlyReset");
             navigate("../login");
           } else {
-            setInvalidRP(true);
-            setMessageRP(data.message);
+            setInvalidResetPassword(true);
+            setMessageResetPassword(data.message);
           }
         });
     },
@@ -255,10 +269,10 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        invalidL,
-        invalidR,
-        invalidF,
-        invalidRP,
+        invalidLogin,
+        invalidRegister,
+        invalidForget,
+        invalidResetPassword,
         userId,
         login,
         logout,
@@ -266,17 +280,19 @@ export const AuthProvider = ({ children }) => {
         token,
         forget,
         reset,
-        messageL,
+        messageLogin,
         logOutOnlyReset,
         logOutOnlyOtp,
-        messageF,
-        messageE,
-        messageR,
-        messageRP,
+        messageForget,
+        messageEmail,
+        messageRegister,
+        messageResetPassword,
         verifyEmail,
         verifyMfa,
-        messageM,
+        messageMfa,
         user,
+        invalidEmail,
+        invalidMfa,
       }}
     >
       {children}
