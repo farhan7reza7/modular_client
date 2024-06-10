@@ -40,54 +40,60 @@ export const AuthProvider = ({ children }) => {
   const [messageRegister, setMessageRegister] = useState("");
 
   useEffect(() => {
-    try {
-      //handle data retainity on refresh
-      const tokenz = JSON.parse(localStorage.getItem("token"));
-      const id = JSON.parse(localStorage.getItem("userId"));
+    if (!isAuthenticated) {
+      try {
+        //handle data retainity on refresh
+        const tokenz = JSON.parse(localStorage.getItem("token"));
+        const id = JSON.parse(localStorage.getItem("userId"));
 
-      if (tokenz && id) {
-        setIsAuthenticated(true);
-        setUserId(id);
-        setToken(tokenz);
-        setLogOutOnlyReset(false);
-        setLogOutOnlyOtp(false);
-        localStorage.removeItem("logOutOnlyReset");
-        localStorage.removeItem("logInner");
-      } else {
-        //handle refresh on logged on for logging in through redirecting
-        const tokens = query.get("token");
-        const userIds = query.get("userId");
-
-        if (JSON.parse(localStorage.getItem("logInner")) && tokens && userIds) {
-          fetch(`/api/verify-user?token=${tokens}&userId=${userIds}`, {
-            method: "GET",
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.valid) {
-                setIsAuthenticated(true);
-                setToken(data.token);
-                setUserId(userIds);
-                setLogOutOnlyOtp(false);
-                localStorage.removeItem("logInner");
-                setLogOutOnlyReset(false);
-                localStorage.removeItem("logOutOnlyReset");
-              }
-            });
+        if (tokenz && id) {
+          setIsAuthenticated(true);
+          setUserId(id);
+          setToken(tokenz);
+          setLogOutOnlyReset(false);
+          setLogOutOnlyOtp(false);
+          localStorage.removeItem("logOutOnlyReset");
+          localStorage.removeItem("logInner");
         } else {
-          if (JSON.parse(localStorage.getItem("logInner"))) {
-            setLogOutOnlyOtp(true);
-          }
-          if (JSON.parse(localStorage.getItem("logOutOnlyReset"))) {
-            setLogOutOnlyReset(true);
+          //handle refresh on logged on for logging in through redirecting
+          const tokens = query.get("token");
+          const userIds = query.get("userId");
+
+          if (
+            JSON.parse(localStorage.getItem("logInner")) &&
+            tokens &&
+            userIds
+          ) {
+            fetch(`/api/verify-user?token=${tokens}&userId=${userIds}`, {
+              method: "GET",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.valid) {
+                  setIsAuthenticated(true);
+                  setToken(data.token);
+                  setUserId(userIds);
+                  setLogOutOnlyOtp(false);
+                  localStorage.removeItem("logInner");
+                  setLogOutOnlyReset(false);
+                  localStorage.removeItem("logOutOnlyReset");
+                }
+              });
+          } else {
+            if (JSON.parse(localStorage.getItem("logInner"))) {
+              setLogOutOnlyOtp(true);
+            }
+            if (JSON.parse(localStorage.getItem("logOutOnlyReset"))) {
+              setLogOutOnlyReset(true);
+            }
           }
         }
+      } catch (error) {
+        localStorage.clear();
+        setIsAuthenticated(false);
       }
-    } catch (error) {
-      localStorage.clear();
-      setIsAuthenticated(false);
     }
-  }, [query]);
+  }, [query, isAuthenticated]);
 
   const navigate = useNavigate();
 
@@ -161,6 +167,7 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${details.token}`,
         },
         body: JSON.stringify(details),
       })
