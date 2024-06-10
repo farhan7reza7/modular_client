@@ -19,47 +19,62 @@ export const AuthProvider = ({ children }) => {
     [location.search]
   );
 
+  const [user, setUser] = useState("");
+  const [userId, setUserId] = useState("");
+  const [token, setToken] = useState("");
+  const [logOutOnlyReset, setLogOutOnlyReset] = useState(false);
+  const [logOutOnlyOtp, setLogOutOnlyOtp] = useState(false);
+
   const [invalidL, setInvalidL] = useState(false);
   const [invalidR, setInvalidR] = useState(false);
   const [invalidF, setInvalidF] = useState(false);
   const [invalidRP, setInvalidRP] = useState(false);
-
-  const [user, setUs] = useState("");
-  const [userId, setUser] = useState("");
-  const [token, setToken] = useState("");
-  const [re, setRe] = useState(false);
+  //const [invalidE, setInvalidE] = useState(false);
 
   const [messageF, setMessageF] = useState("");
   const [messageL, setMessageL] = useState("");
   const [messageRP, setMessageRP] = useState("");
   const [messageE, setMessageE] = useState("");
   const [messageM, setMessageM] = useState("");
+  const [messageR, setMessageR] = useState("");
 
   useEffect(() => {
     try {
+      //handle data retainity on refresh
       const tokenz = JSON.parse(localStorage.getItem("token"));
       const id = JSON.parse(localStorage.getItem("userId"));
-
-      if (tokenz) {
-        const reS = JSON.parse(localStorage.getItem("re"));
-        if (reS) {
-          setRe(reS);
-        } else {
-          setIsAuthenticated(true);
-          setUser(id);
-          setToken(tokenz);
-        }
+      if (tokenz && id) {
+        setIsAuthenticated(true);
+        setUserId(id);
+        setToken(tokenz);
+        setLogOutOnlyReset(false);
+        setLogOutOnlyOtp(false);
+        localStorage.removeItem("logOutOnlyReset");
+        localStorage.removeItem("logInner");
       } else {
+        //handle refresh on logged on for logging in through redirecting
         const tokens = query.get("token");
         const userIds = query.get("userId");
-        if (JSON.parse(localStorage.getItem("ve")) && tokens && userIds) {
+        if (JSON.parse(localStorage.getItem("logInner")) && tokens && userIds) {
           setIsAuthenticated(true);
           setToken(tokens);
-          setUser(userIds);
+          setUserId(userIds);
+          setLogOutOnlyOtp(false);
+          localStorage.removeItem("logInner");
+          setLogOutOnlyReset(false);
+          localStorage.removeItem("logOutOnlyReset");
+        } else {
+          if (JSON.parse(localStorage.getItem("logInner"))) {
+            setLogOutOnlyOtp(true);
+          }
+          if (JSON.parse(localStorage.getItem("logOutOnlyReset"))) {
+            setLogOutOnlyReset(true);
+          }
         }
       }
     } catch (error) {
       localStorage.clear();
+      setIsAuthenticated(false);
     }
   }, [query]);
 
@@ -76,25 +91,26 @@ export const AuthProvider = ({ children }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.valid) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("userId");
           setInvalidL(false);
           setMessageL(data.message);
-          localStorage.setItem("ve", JSON.stringify(true));
+          setLogOutOnlyOtp(true);
+          localStorage.setItem("logInner", JSON.stringify(true));
         } else {
           setInvalidL(true);
           setMessageL(data.message);
         }
+      })
+      .catch((error) => {
+        setMessageL(error.message);
       });
   }, []);
 
   const logout = useCallback(async () => {
     setIsAuthenticated(false);
-    setUser("");
+    setUserId("");
     setToken("");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("ve");
+    setUser("");
+    localStorage.clear();
   }, []);
 
   const register = useCallback(
@@ -109,21 +125,20 @@ export const AuthProvider = ({ children }) => {
         .then((res) => res.json())
         .then((data) => {
           if (data.valid) {
-            //setIsAuthenticated(true);
             setInvalidR(false);
             setMessageM(data.message);
-            localStorage.setItem("ve", JSON.stringify(true));
-
-            //setUser(data.userId);
-            //setToken(data.token);
-            //localStorage.setItem("token", JSON.stringify(data.token));
-            //localStorage.setItem("userId", JSON.stringify(data.userId));
+            setLogOutOnlyOtp(true);
+            localStorage.setItem("logInner", JSON.stringify(true));
             navigate(
               `../otp?token=${data.token}&username=${data.username}&password=${data.password}&email=${data.email}`
             );
           } else {
             setInvalidR(true);
+            setMessageR(data.message);
           }
+        })
+        .catch((error) => {
+          setMessageR(error.message);
         });
     },
     [navigate]
@@ -140,25 +155,19 @@ export const AuthProvider = ({ children }) => {
       })
         .then((res) => res.json())
         .then((data) => {
-          //setMessageE(data.message);
           if (data.valid) {
-            console.log("valid working");
             setIsAuthenticated(true);
             setToken(data.token);
-            setUser(data.userId);
-            setUs(data.user);
+            setUserId(data.userId);
+            setUser(data.user);
+            setLogOutOnlyReset(false);
+            setLogOutOnlyOtp(false);
             localStorage.setItem("token", JSON.stringify(data.token));
             localStorage.setItem("userId", JSON.stringify(data.userId));
-            //setMessageM(data.message);
-            /*navigate({
-              pathname: "../",
-              search: `?token=${data.token}&userId=${data.userId}`,
-            });*/
-            //navigate(`../?token=${data.token}&userId=${data.userId}`);
+            localStorage.removeItem("logInner");
             navigate("../");
           } else {
             setMessageM(data.message);
-            console.log("valid not working");
           }
         })
         .catch((error) => {
@@ -180,17 +189,16 @@ export const AuthProvider = ({ children }) => {
       .then((data) => {
         if (data.valid) {
           setMessageF(data.message);
-          setUser(data.userId);
-          setToken(data.token);
           setInvalidF(false);
-          setRe(true);
-          localStorage.setItem("token", JSON.stringify(data.token));
-          localStorage.setItem("userId", JSON.stringify(data.userId));
-          localStorage.setItem("re", JSON.stringify(true));
+          setLogOutOnlyReset(true);
+          localStorage.setItem("logOutOnlyReset", JSON.stringify(true));
         } else {
           setInvalidF(true);
           setMessageF(data.message);
         }
+      })
+      .catch((error) => {
+        setMessageF(error.message);
       });
   }, []);
 
@@ -225,14 +233,14 @@ export const AuthProvider = ({ children }) => {
         .then((data) => {
           if (data.valid) {
             setMessageRP(data.message);
-            setIsAuthenticated(false);
-            setUser("");
+            //setIsAuthenticated(false);
+            setUserId("");
             setToken("");
-            setRe(false);
+            setLogOutOnlyReset(false);
             setInvalidRP(false);
             localStorage.removeItem("token");
             localStorage.removeItem("userId");
-            localStorage.removeItem("re");
+            localStorage.removeItem("logOutOnlyReset");
             navigate("../login");
           } else {
             setInvalidRP(true);
@@ -259,9 +267,11 @@ export const AuthProvider = ({ children }) => {
         forget,
         reset,
         messageL,
-        re,
+        logOutOnlyReset,
+        logOutOnlyOtp,
         messageF,
         messageE,
+        messageR,
         messageRP,
         verifyEmail,
         verifyMfa,

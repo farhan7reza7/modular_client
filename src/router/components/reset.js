@@ -6,8 +6,10 @@ import { useLocation } from "react-router-dom";
 const Reset = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
+
   const token = query.get("token");
   const userId = query.get("userId");
+
   const { reset, invalidRP, messageRP } = useAuth();
   const formik = useFormik({
     initialValues: { password: "" },
@@ -23,7 +25,7 @@ const Reset = () => {
       <div>
         <p>Reset password</p>
         <form onSubmit={formik.handleSubmit}>
-          <label htmlFor="pass">Password</label>
+          <label htmlFor="pass">New password</label>
           <input
             name="password"
             value={formik.values.password}

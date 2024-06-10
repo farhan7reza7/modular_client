@@ -1,19 +1,20 @@
 import { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import configRoutes from "./configRoutes";
-import ProtectedRoutes from "./protectedRoutes";
+import ProtectedRoutes, { RedirectRoutes } from "./protectedRoutes";
 import { useAuth } from "./authContext";
 
 const AppRoutes = () => {
-  const { re } = useAuth();
+  const { logOutOnlyReset, logOutOnlyOtp } = useAuth();
   const notProtect = [
     "/login",
     "/logout",
     "/register",
     "/user/:id",
     "/forget",
-    "/otp",
-    re ? "/reset" : null,
+    "*",
+    logOutOnlyOtp ? "/otp" : null,
+    logOutOnlyReset ? "/reset" : null,
   ];
   const routes = configRoutes.map((el, i) => {
     if (!notProtect.includes(el.path)) {
@@ -31,7 +32,8 @@ const AppRoutes = () => {
           </Route>
         );
       }
-      if (el.path !== "/reset") {
+
+      if (el.path !== "/reset" && el.path !== "/otp") {
         return (
           <Route
             path={el.path}
@@ -46,6 +48,15 @@ const AppRoutes = () => {
       } else {
         return null;
       }
+    }
+
+    if (el.path === "/login") {
+      return (
+        <Route
+          path={el.path}
+          element={<RedirectRoutes>{el.element}</RedirectRoutes>}
+        />
+      );
     }
 
     return (

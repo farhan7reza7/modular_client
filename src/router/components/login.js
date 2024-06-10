@@ -75,7 +75,6 @@ const LogIn = () => {
         <div>{messageL}</div>
         {invalidL && (
           <div>
-            <p>Please fill correct details, and then submit</p>
             <br />
             <button type="button" onClick={() => navigate("../forget")}>
               Forget password

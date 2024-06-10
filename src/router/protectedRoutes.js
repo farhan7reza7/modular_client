@@ -7,3 +7,8 @@ const ProtectedRoutes = ({ children }) => {
 };
 
 export default ProtectedRoutes;
+
+export const RedirectRoutes = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return !isAuthenticated ? children : <Navigate to="../" />;
+};
