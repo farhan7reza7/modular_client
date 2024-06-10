@@ -3,7 +3,8 @@ import * as Yup from "yup";
 import { useAuth } from "../authContext";
 
 const Register = () => {
-  const { register, invalidRegister, verifyEmail, messageEmail } = useAuth();
+  const { register, invalidRegister, verifyEmail, invalidEmail, messageEmail } =
+    useAuth();
 
   const formik = useFormik({
     initialValues: { username: "", password: "" },
@@ -48,6 +49,10 @@ const Register = () => {
               Verify email
             </button>
             <div>{messageEmail}</div>
+            {invalidEmail && !messageEmail && (
+              <div>please use correct email</div>
+            )}
+            <br />
           </>
         )}
         {formik.errors.email && formik.touched.email && (
