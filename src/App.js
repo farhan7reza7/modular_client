@@ -7,9 +7,17 @@ import {
   useTrail,
   useChain,
 } from "@react-spring/web";
+import {
+  List,
+  MultiGrid,
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  Grid,
+} from "react-virtualized";
 import logo from "./logo.svg";
 import "./App.css";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { adder, editer, deleter, updater, selectAll } from "./reducers";
@@ -112,12 +120,14 @@ const items = useSelector(itemsSelector);*/
     setInput(task);
     return task;
   };
+
   return (
     <div className="App">
       <div className="navBased">
         <AppNavBar />
         <AppRoutes />
       </div>
+      <VirtualizeApp />
       <div className="reduxTD">
         <input
           type="text"
@@ -225,6 +235,279 @@ const items = useSelector(itemsSelector);*/
     </div>
   );
 }
+
+const VirtualizeApp = () => {
+  const refEl = useRef(null);
+  const refEl2 = useRef(null);
+
+  const descrip = useCallback((ind) => {
+    let str = "";
+    for (let i = 0; i <= ind; i++) {
+      str += `(Item ${ind + 1} description)\n`;
+      if (i >= ind % 50) {
+        break;
+      }
+    }
+    return str;
+  }, []);
+
+  // virtualized in use
+  const dataArray = useMemo(
+    () =>
+      Array.from({ length: 10000 }, (el, ind) => ({
+        name: ind + 1,
+        item: `Item ${ind + 1} `,
+        description: descrip(ind),
+      })),
+    [descrip]
+  );
+
+  const contStyle = {
+    backgroundColor: "#fff",
+    color: "#111",
+    padding: "10px",
+    margin: "10px auto",
+    border: "2px solid gray",
+  };
+
+  const cache = useMemo(
+    () =>
+      new CellMeasurerCache({
+        fixedWidth: true,
+        defaultHeight: 50,
+      }),
+    []
+  );
+
+  const cache1 = useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultHeight: 50,
+        fixedWidth: true,
+      }),
+    []
+  );
+
+  const cache2 = useMemo(
+    () =>
+      new CellMeasurerCache({
+        defaultHeight: 50,
+        fixedWidth: true,
+      }),
+    []
+  );
+
+  const renderCell = useCallback(
+    ({ columnIndex, key, rowIndex, style, parent }) => {
+      const cellData =
+        rowIndex === 0
+          ? Object.keys(dataArray[0])[columnIndex]
+          : dataArray[rowIndex - 1][Object.keys(dataArray[0])[columnIndex]];
+
+      return (
+        <CellMeasurer
+          parent={parent}
+          cache={cache1}
+          key={key}
+          rowIndex={rowIndex}
+          columnIndex={columnIndex}
+        >
+          {({ measure }) => (
+            <RenderItem
+              measure={measure}
+              columnIndex={columnIndex}
+              style={style}
+              rowIndex={rowIndex}
+              cellData={cellData}
+            />
+          )}
+        </CellMeasurer>
+      );
+    },
+    [dataArray, cache1]
+  );
+
+  const renderList = useCallback(
+    ({ index, key, style, parent }) => {
+      return (
+        <CellMeasurer cache={cache} parent={parent} rowIndex={index} key={key}>
+          {({ measure }) => (
+            <RenderList
+              measure={measure}
+              refEl={refEl}
+              style={style}
+              index={index}
+              dataArray={dataArray}
+              cache={cache}
+            />
+          )}
+        </CellMeasurer>
+      );
+    },
+    [dataArray, cache]
+  );
+
+  return (
+    <>
+      <div className="virtualized" style={{ ...contStyle, height: "500px" }}>
+        <AutoSizer>
+          {({ width, height }) => (
+            <MultiGrid
+              ref={refEl2}
+              rowCount={dataArray.length + 1}
+              rowHeight={cache1.rowHeight}
+              width={600}
+              height={height}
+              columnCount={Object.keys(dataArray[0]).length}
+              columnWidth={200}
+              fixedColumnCount={1}
+              fixedRowCount={1}
+              cellRenderer={renderCell}
+              deferredMeasurementCache={cache1}
+            />
+          )}
+        </AutoSizer>
+      </div>
+      <br />
+      <div
+        style={{
+          ...contStyle,
+          height: "500px",
+        }}
+      >
+        <AutoSizer>
+          {({ width, height }) => (
+            <Grid
+              height={height}
+              width={width}
+              rowCount={dataArray.length + 1}
+              columnCount={Object.keys(dataArray[0]).length}
+              columnWidth={200}
+              rowHeight={cache2.rowHeight}
+              deferredMeasurementCache={cache2}
+              cellRenderer={({ style, rowIndex, columnIndex, key, parent }) => {
+                const cellData =
+                  rowIndex === 0
+                    ? Object.keys(dataArray[0])[columnIndex]
+                    : dataArray[rowIndex - 1][
+                        Object.keys(dataArray[0])[columnIndex]
+                      ];
+                return (
+                  <CellMeasurer
+                    parent={parent}
+                    cache={cache2}
+                    key={key}
+                    rowIndex={rowIndex}
+                    columnIndex={columnIndex}
+                  >
+                    {({ measure }) => (
+                      <CellRenderer
+                        cellData={cellData}
+                        measure={measure}
+                        rowIndex={rowIndex}
+                        style={style}
+                      />
+                    )}
+                  </CellMeasurer>
+                );
+              }}
+            />
+          )}
+        </AutoSizer>
+      </div>
+      <br />
+      <div className="virtualized" style={{ ...contStyle, height: "500px" }}>
+        <AutoSizer>
+          {({ width, height }) => (
+            <List
+              ref={refEl}
+              rowCount={dataArray.length}
+              rowHeight={cache.rowHeight}
+              width={width}
+              height={height}
+              rowRenderer={renderList}
+              deferredMeasurementCache={cache}
+            />
+          )}
+        </AutoSizer>
+      </div>
+    </>
+  );
+};
+
+const CellRenderer = ({ measure, cellData, style, rowIndex }) => {
+  const [first, setFirst] = useState(true);
+
+  useEffect(() => {
+    measure();
+    if (first) setFirst(false);
+  }, [measure, first]);
+
+  return (
+    <div
+      style={{
+        ...style,
+        backgroundColor: rowIndex % 2 ? "aliceblue" : "#fff",
+        fontWeight: rowIndex === 0 ? "bold" : "",
+      }}
+    >
+      {cellData}
+    </div>
+  );
+};
+
+const RenderItem = ({ measure, style, cellData, rowIndex, columnIndex }) => {
+  const [first, setFirst] = useState(true);
+
+  useEffect(() => {
+    measure();
+    if (first) setFirst(false);
+  }, [measure, first]);
+
+  return (
+    <div
+      style={{
+        ...style,
+        backgroundColor: columnIndex % 2 ? "aliceblue" : "#fff",
+        fontWeight: rowIndex === 0 ? "bold" : "",
+      }}
+    >
+      {cellData}
+    </div>
+  );
+};
+
+const RenderList = ({ measure, refEl, style, index, dataArray, cache }) => {
+  const [toggle, setToggle] = useState(false);
+  const [first, setFirst] = useState(true);
+
+  useEffect(() => {
+    measure();
+    if (first) setFirst(false);
+  }, [measure, toggle, first]);
+
+  return (
+    <div
+      style={{
+        ...style,
+        backgroundColor: index % 2 ? "aliceblue" : "#fff",
+        padding: "10px",
+      }}
+    >
+      {toggle ? dataArray[index]["name"] : dataArray[index]["description"]}
+      <br />
+      <button
+        type="button"
+        onClick={() => {
+          setToggle((val) => !val);
+          cache.clear(index);
+        }}
+      >
+        Update
+      </button>
+    </div>
+  );
+};
 
 const useAsync = (asynFunction, url) => {
   const [data, setData] = useState(null);

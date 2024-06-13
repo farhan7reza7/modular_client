@@ -17,6 +17,7 @@
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
     "react-spring": "^9.7.3",
+    "react-virtualized": "^9.22.5",
     "redux": "^5.0.1",
     "reselect": "^5.1.1",
     "web-vitals": "^2.1.4",
