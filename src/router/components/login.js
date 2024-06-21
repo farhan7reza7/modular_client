@@ -65,8 +65,8 @@ const LogIn = () => {
         )}
         <input
           type="submit"
-          onClick={() => setCheck(true)}
-          disabled={formik.isSubmitting}
+          onClick={() => !check && setCheck(true)}
+          disabled={formik.isSubmitting || (!formik.isValid && check)}
           value="Log in"
         />
         {formik.isValidating && <div>Validating...</div>}

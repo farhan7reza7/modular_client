@@ -33,8 +33,8 @@ function App() {
     ref: ref1,
     from: { transform: "rotate(0deg)" },
     to: { transform: "rotate(360deg)" },
-    //    config: { duration: 20000 },
-    //loop: true,
+    config: { duration: 20000 },
+    loop: true,
   });
 
   const listEls = Array.from({ length: 10 }, (el, index) => index);
@@ -215,7 +215,7 @@ const items = useSelector(itemsSelector);*/
           target="_blank"
           rel="noopener noreferrer"
         >
-          React
+          .
         </a>
         <br />
         {styles.map((style, index) => (
