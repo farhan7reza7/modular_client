@@ -25,6 +25,9 @@ import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+
 function App() {
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
@@ -579,4 +582,6 @@ const useLocalStorage = (initialKey, initialValue) => {
   return { stored, updateValue };
 };
 
-export default App;
+export default withAuthenticator(App, {
+  socialProviders: ["facebook"],
+});
