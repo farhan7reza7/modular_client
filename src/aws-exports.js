@@ -26,7 +26,7 @@ const awsmobile = {
         "PHONE_NUMBER"
     ],
     "aws_cognito_social_providers": [
-        "FACEBOOK"
+        "GOOGLE"
     ],
     "aws_cognito_signup_attributes": [
         "EMAIL"

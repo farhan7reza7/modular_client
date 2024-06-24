@@ -583,5 +583,5 @@ const useLocalStorage = (initialKey, initialValue) => {
 };
 
 export default withAuthenticator(App, {
-  socialProviders: ["facebook"],
+  socialProviders: ["facebook", "google"],
 });
