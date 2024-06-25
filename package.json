@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aws-amplify/auth": "^6.3.7",
+    "@aws-amplify/core": "^6.3.3",
     "@aws-amplify/ui-react": "^6.1.12",
     "@react-spring/web": "^9.7.3",
     "@reduxjs/toolkit": "^2.2.5",

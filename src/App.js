@@ -26,8 +26,12 @@ import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
 import { Amplify } from "aws-amplify";
+import { Auth } from "@aws-amplify/auth";
+import { Hub } from "@aws-amplify/core";
+
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
 
@@ -104,7 +108,7 @@ const items = useSelector(itemsSelector);*/
     fetchUser();
 
     // Listen to authentication events
-    Amplify.Hub.listen("auth", ({ payload: { event, data } }) => {
+    Hub.listen("auth", ({ payload: { event, data } }) => {
       switch (event) {
         case "signIn":
           fetchUser();
