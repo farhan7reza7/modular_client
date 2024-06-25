@@ -24,11 +24,30 @@ import { adder, editer, deleter, updater, selectAll } from "./reducers";
 import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
+import { getCurrentUser } from "@aws-amplify/auth";
 
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 function App() {
+  const [us, setUs] = useState("");
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const user = await getCurrentUser();
+        setUs({
+          username: user.username,
+          email: user.attributes.email,
+          // Add other attributes you want to retrieve
+        });
+      } catch (error) {
+        console.log("Error fetching current user", error);
+        //return null;
+      }
+    }
+    getUser();
+  });
+
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
 
@@ -129,6 +148,15 @@ const items = useSelector(itemsSelector);*/
       <div className="navBased">
         <AppNavBar />
         <AppRoutes />
+      </div>
+      <div>
+        {us ? (
+          <div>
+            username: {us.username} email: {us.email}{" "}
+          </div>
+        ) : (
+          "not work"
+        )}
       </div>
       <Authenticator>
         {({ signOut, user }) => (
