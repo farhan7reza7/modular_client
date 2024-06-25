@@ -35,6 +35,7 @@ function App() {
     email: "notworkemail",
     // Add other attributes here
   });
+
   useEffect(() => {
     async function getUser() {
       try {
@@ -42,7 +43,6 @@ function App() {
         setUs({
           username: user.username,
           email: user.attributes.email,
-          // Add other attributes you want to retrieve
         });
 
         console.log("okay status, should retrive");
@@ -170,6 +170,8 @@ const items = useSelector(itemsSelector);*/
             {user ? (
               <div>
                 <p>current user: {user.username}</p>
+                <p>Email: {user.attributes.email}</p>
+                <p>name: {user.attributes.name}</p>
                 <button type="button" onClick={signOut}>
                   Sign out
                 </button>
