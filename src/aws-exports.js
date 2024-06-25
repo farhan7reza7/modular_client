@@ -24,7 +24,7 @@ const awsmobile = {
   },
   federationTarget: "COGNITO_USER_POOLS",
   aws_cognito_username_attributes: ["EMAIL", "PHONE_NUMBER"],
-  aws_cognito_social_providers: ["FACEBOOK", "GOOGLE", "AMAZON"],
+  aws_cognito_social_providers: ["GOOGLE", "FACEBOOK", "AMAZON"],
   aws_cognito_signup_attributes: ["EMAIL"],
   aws_cognito_mfa_configuration: "OFF",
   aws_cognito_mfa_types: ["SMS"],
