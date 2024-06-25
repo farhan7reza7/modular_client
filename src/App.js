@@ -26,7 +26,7 @@ import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
 import { Amplify } from "aws-amplify";
-import { withAuthenticator } from "@aws-amplify/ui-react";
+import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
@@ -88,13 +88,38 @@ const items = useSelector(itemsSelector);*/
   const [input, setInput] = useState("");
   const [change, setChange] = useState(false);
 
+  const [userD, setUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const user = await Amplify.Auth.currentAuthenticatedUser();
+        setUser(user);
+        console.log("userD", userD);
+      } catch (error) {
+        console.error("Error fetching user: ", error);
+      }
+    }
+
+    fetchUser();
+
+    // Listen to authentication events
+    Amplify.Hub.listen("auth", ({ payload: { event, data } }) => {
+      switch (event) {
+        case "signIn":
+          fetchUser();
+          break;
+        case "signOut":
+          setUser(null);
+          break;
+        default:
+          break;
+      }
+    });
+  }, []);
+
   useEffect(() => {
     dispatch(dataFetcher());
-    const fetchUser = async () => {
-      const user = await Amplify.Auth.currentAuthenticatedUser();
-      console.log("user", user);
-    };
-    fetchUser();
   }, [dispatch]);
 
   const {
@@ -138,7 +163,22 @@ const items = useSelector(itemsSelector);*/
         <AppNavBar />
         <AppRoutes />
       </div>
-      <div className="user"></div>
+      <Authenticator>
+        {({ signOut, user }) => (
+          <div className="user">
+            {user ? (
+              <div>
+                <p>current user: {user.username}</p>
+                <button type="button" onClick={signOut}>
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
+        )}
+      </Authenticator>
       <VirtualizeApp />
       <div className="reduxTD">
         <input
