@@ -25,8 +25,11 @@ import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
+import { Amplify } from "aws-amplify";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import awsExports from "./aws-exports";
+Amplify.configure(awsExports);
 
 function App() {
   const ref1 = useSpringRef();
@@ -87,6 +90,11 @@ const items = useSelector(itemsSelector);*/
 
   useEffect(() => {
     dispatch(dataFetcher());
+    const fetchUser = async () => {
+      const user = await Amplify.auth.currentAuthenticatedUser();
+      console.log("user", user);
+    };
+    fetchUser();
   }, [dispatch]);
 
   const {
@@ -130,6 +138,7 @@ const items = useSelector(itemsSelector);*/
         <AppNavBar />
         <AppRoutes />
       </div>
+      <div className="user"></div>
       <VirtualizeApp />
       <div className="reduxTD">
         <input
