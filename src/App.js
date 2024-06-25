@@ -26,35 +26,40 @@ import { adder, editer, deleter, updater, selectAll } from "./reducers";
 import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
-import { getCurrentUser } from "@aws-amplify/auth";
 
+import { getCurrentUser, fetchUserAttributes } from "@aws-amplify/auth";
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 function App() {
-  const [us, setUs] = useState({
-    username: "notworkusername",
-    email: "notworkemail",
-    // Add other attributes here
+  const [currentUser, setCurrentUser] = useState({
+    username: "",
+    email: "",
+    id: "",
+    password: "",
   });
 
   useEffect(() => {
-    async function getUser() {
+    async function getUserData() {
       try {
         const user = await getCurrentUser();
-        setUs({
-          username: user.username,
-          email: user.attributes.email,
-        });
 
-        console.log("okay status, should retrive");
+        if (user) {
+          const attributes = await fetchUserAttributes(user);
+          setCurrentUser({
+            email: attributes.email,
+            id: attributes.sub || attributes.id || attributes.user_id,
+          });
+          console.log("okay status, should retrive");
+        } else {
+          console.log("user is not authenticcated");
+        }
       } catch (error) {
         console.log("Error fetching current user", error);
-        //return null;
       }
     }
-    getUser();
-  }, [us]);
+    getUserData();
+  }, []);
 
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
@@ -158,13 +163,11 @@ const items = useSelector(itemsSelector);*/
         <AppRoutes />
       </div>
       <div>
-        {us ? (
-          <div>
-            username: {us.username} email: {us.email}{" "}
-          </div>
-        ) : (
-          "not work"
-        )}
+        <div>
+          <p> username: {currentUser.username}</p>
+          <p> usernameId: {currentUser.id}</p>
+          <p> email: {currentUser.email}</p>
+        </div>
       </div>
       <Authenticator>
         {({ signOut, user }) => (
