@@ -25,15 +25,8 @@ import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
-import { Amplify } from "aws-amplify";
-import { Auth } from "@aws-amplify/auth";
-import { Hub } from "@aws-amplify/core";
-
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-
-import awsExports from "./aws-exports";
-Amplify.configure(awsExports);
 
 function App() {
   const ref1 = useSpringRef();
@@ -91,36 +84,6 @@ const items = useSelector(itemsSelector);*/
 
   const [input, setInput] = useState("");
   const [change, setChange] = useState(false);
-
-  const [userD, setUser] = useState(null);
-
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const user = await Amplify.Auth.currentAuthenticatedUser();
-        setUser(user);
-        console.log("userD", userD);
-      } catch (error) {
-        console.error("Error fetching user: ", error);
-      }
-    }
-
-    fetchUser();
-
-    // Listen to authentication events
-    Hub.listen("auth", ({ payload: { event, data } }) => {
-      switch (event) {
-        case "signIn":
-          fetchUser();
-          break;
-        case "signOut":
-          setUser(null);
-          break;
-        default:
-          break;
-      }
-    });
-  }, []);
 
   useEffect(() => {
     dispatch(dataFetcher());
