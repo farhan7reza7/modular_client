@@ -7,6 +7,7 @@ import {
   useTrail,
   useChain,
 } from "@react-spring/web";
+
 import {
   List,
   MultiGrid,
@@ -15,6 +16,7 @@ import {
   CellMeasurerCache,
   Grid,
 } from "react-virtualized";
+
 import logo from "./logo.svg";
 import "./App.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -169,8 +171,7 @@ const items = useSelector(itemsSelector);*/
           <div className="user">
             {user ? (
               <div>
-                <p>current user: {user.username}</p>
-                {user.attributes.email && <p>Email: {user.attributes.email}</p>}
+                <p>current user: {user.email}</p>
                 {user.attributes.name && <p>name: {user.attributes.name}</p>}
                 <button type="button" onClick={signOut}>
                   Sign out
