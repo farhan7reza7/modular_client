@@ -91,7 +91,7 @@ const items = useSelector(itemsSelector);*/
   useEffect(() => {
     dispatch(dataFetcher());
     const fetchUser = async () => {
-      const user = await Amplify.auth.currentAuthenticatedUser();
+      const user = await Amplify.Auth.currentAuthenticatedUser();
       console.log("user", user);
     };
     fetchUser();
