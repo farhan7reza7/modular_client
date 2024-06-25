@@ -40,13 +40,15 @@ function App() {
           email: user.attributes.email,
           // Add other attributes you want to retrieve
         });
+
+        console.log("okay status, should retrive");
       } catch (error) {
         console.log("Error fetching current user", error);
         //return null;
       }
     }
     getUser();
-  });
+  }, [us]);
 
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
