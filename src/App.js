@@ -28,6 +28,8 @@ import AppNavBar from "./router/appNavbar";
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { Amplify } from "aws-amplify";
+import awsExports from "./aws-exports";
+Amplify.configure(awsExports);
 
 function App() {
   const [userD, setUserD] = useState("");
