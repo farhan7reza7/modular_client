@@ -27,8 +27,37 @@ import AppNavBar from "./router/appNavbar";
 
 import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import { Amplify } from "aws-amplify";
 
 function App() {
+  const [userD, setUserD] = useState("");
+
+  useEffect(() => {
+    async function retrieveCurrentUserData() {
+      try {
+        const sessionData = await Amplify.Auth.currentSession();
+        const user = sessionData.user;
+        setUserD(user);
+
+        console.log("Current user data:");
+        console.log("  Username:", user.username);
+        console.log("  ID:", user.sub); // Use sub for unique user ID
+
+        // Access email attribute if configured in your Cognito user pool
+        if (user.attributes && user.attributes.email) {
+          console.log("  Email:", user.attributes.email);
+        }
+
+        // Handle social provider information retrieval (if needed)
+        // ... (adapt for your specific provider)
+      } catch (error) {
+        console.error("Error retrieving current user:", error);
+      }
+    }
+    // Usage example:
+    retrieveCurrentUserData();
+  });
+
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
 
@@ -136,6 +165,7 @@ const items = useSelector(itemsSelector);*/
             {user ? (
               <div>
                 <p>current user: {user.username}</p>
+                <p>{userD ? userD.attributes.email : "not work"}</p>
                 <button type="button" onClick={signOut}>
                   Sign out
                 </button>
@@ -599,5 +629,5 @@ const useLocalStorage = (initialKey, initialValue) => {
 };
 
 export default withAuthenticator(App, {
-  socialProviders: ["facebook", "google", "amazon"],
+  socialProviders: ["google", "facebook", "amazon"],
 });
