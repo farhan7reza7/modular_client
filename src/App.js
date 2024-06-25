@@ -172,7 +172,6 @@ const items = useSelector(itemsSelector);*/
             {user ? (
               <div>
                 <p>current user: {user.email}</p>
-                {user.attributes.name && <p>name: {user.attributes.name}</p>}
                 <button type="button" onClick={signOut}>
                   Sign out
                 </button>
