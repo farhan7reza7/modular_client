@@ -30,7 +30,11 @@ import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 function App() {
-  const [us, setUs] = useState("");
+  const [us, setUs] = useState({
+    username: "notworkusername",
+    email: "notworkemail",
+    // Add other attributes here
+  });
   useEffect(() => {
     async function getUser() {
       try {
