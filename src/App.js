@@ -42,10 +42,11 @@ function App() {
   useEffect(() => {
     async function getUserData() {
       try {
-        const user = await getCurrentUser();
+        //const user = await getCurrentUser();
+        const attributes = await fetchUserAttributes();
 
-        if (user) {
-          const attributes = await fetchUserAttributes(user);
+        if (attributes) {
+          //const attributes = await fetchUserAttributes(user);
           setCurrentUser({
             email: attributes.email,
             id: attributes.sub || attributes.id || attributes.user_id,
