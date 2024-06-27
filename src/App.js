@@ -35,6 +35,7 @@ import {
 import "@aws-amplify/ui-react/styles.css";
 
 import { useAuth } from "./router/authContext";
+import { current } from "@reduxjs/toolkit";
 
 function App() {
   const { setIsAuthenticated, isAuthenticated, setToken, setUserId } =
@@ -66,6 +67,7 @@ function App() {
             console.log("error in retri user attrs");
           }
           const email = attributes.email;
+          const id = attributes.sub || attributes.id || attributes.user_id;
 
           await fetch(`/api/current?email=${email}&id=${id}`)
             .then((data) => data.json())
