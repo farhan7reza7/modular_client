@@ -18,7 +18,7 @@ const Home = () => {
     const tn = query.get("token");
     const ur = query.get("userId");
 
-    if (tn && ur && !token && !userId) {
+    if (tn && ur) {
       fetch(`/api/verify-user?token=${tn}&userId=${ur}`, {
         method: "GET",
       })

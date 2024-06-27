@@ -21,14 +21,12 @@ import logo from "./logo.svg";
 import "./App.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from "reselect";
 import { adder, editer, deleter, updater, selectAll } from "./reducers";
 import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
 import { getCurrentUser, fetchUserAttributes } from "@aws-amplify/auth";
-import { Hub } from "@aws-amplify/core";
 import {
   withAuthenticator,
   Authenticator,
@@ -36,17 +34,12 @@ import {
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
-import { useNavigate } from "react-router-dom";
-
 import { useAuth } from "./router/authContext";
 
 function App() {
-  const { setIsAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const { authStatus, user } = useAuthenticator((context) => [
-    context.authStatus,
-    context.user,
-  ]);
+  const { setIsAuthenticated, isAuthenticated, setToken, setUserId } =
+    useAuth();
+  const { authStatus } = useAuthenticator((context) => [context.authStatus]);
 
   const [currentUser, setCurrentUser] = useState({
     username: "",
@@ -79,7 +72,8 @@ function App() {
             .then((data) => {
               if (data.valid) {
                 console.log("user retriev and valid");
-                navigate(`/?token=${data.token}&userId=${data.userId}`);
+                setToken(data.token);
+                setUserId(data.userId);
               } else {
                 console.log("not valid returned: ");
               }
@@ -96,8 +90,10 @@ function App() {
     //if (authStatus === "configuring") {
     if (authStatus === "authenticated") {
       try {
-        setIsAuthenticated(true);
-        handleSignInUp();
+        if (!isAuthenticated) {
+          setIsAuthenticated(true);
+          handleSignInUp();
+        }
       } catch (error) {
         setIsAuthenticated(false);
         console.error("Error fetching user data:", error);
@@ -105,34 +101,9 @@ function App() {
     } else {
       console.log("not auth:", authStatus);
     }
+  }, [authStatus]);
 
-    /*const listener = ({ payload: { event, data } }) => {
-      console.log("Auth event:", event);
-      switch (event) {
-        case "signedIn":
-          handleSignInUp();
-          break;
-        case "signedOut":
-          setIsAuthenticated(false);
-          break;
-        case "signedUp":
-          handleSignInUp();
-          break;
-        default:
-          break;
-      }
-    };
-    const unsubscribe = Hub.listen("auth", listener);
-    console.log("Hub not work if not inside message");
-    //handleSignInUp();
-    return () => unsubscribe();
-*/
-    /*Hub.listen("*", (data) => {
-      console.log("Any Hub event:", data);
-    });*/
-    //}, []);
-
-    /*useEffect(() => {
+  useEffect(() => {
     async function getUserData() {
       try {
         //const user = await getCurrentUser();
@@ -152,8 +123,8 @@ function App() {
         console.log("Error fetching current user", error);
       }
     }
-    getUserData();*/
-  }, [authStatus]);
+    getUserData();
+  }, []);
 
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
