@@ -28,10 +28,26 @@ import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
 import { getCurrentUser, fetchUserAttributes } from "@aws-amplify/auth";
-import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
+import { Hub } from "@aws-amplify/core";
+import {
+  withAuthenticator,
+  Authenticator,
+  useAuthenticator,
+} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "./router/authContext";
+
 function App() {
+  const { setIsAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { authStatus, user } = useAuthenticator((context) => [
+    context.authStatus,
+    context.user,
+  ]);
+
   const [currentUser, setCurrentUser] = useState({
     username: "",
     email: "",
@@ -40,6 +56,83 @@ function App() {
   });
 
   useEffect(() => {
+    const handleSignInUp = async () => {
+      try {
+        let user = "";
+        let attributes = {};
+        try {
+          user = await getCurrentUser();
+        } catch (err) {
+          console.log("error in retri user");
+        }
+        if (user) {
+          console.log("user retriev");
+          try {
+            attributes = await fetchUserAttributes();
+          } catch (err) {
+            console.log("error in retri user attrs");
+          }
+          const email = attributes.email;
+
+          await fetch(`/api/current?email=${email}&id=${id}`)
+            .then((data) => data.json())
+            .then((data) => {
+              if (data.valid) {
+                console.log("user retriev and valid");
+                navigate(`/?token=${data.token}&userId=${data.userId}`);
+              } else {
+                console.log("not valid returned: ");
+              }
+            })
+            .catch((err) => console.log("error from db:", err.message));
+          console.log("user in getCurrentUser: attrs: ", attributes);
+        } else {
+          console.log("user not in getCurrentUser");
+        }
+      } catch (error) {
+        console.log("error in retrieving user: ", error);
+      }
+    };
+    //if (authStatus === "configuring") {
+    if (authStatus === "authenticated") {
+      try {
+        setIsAuthenticated(true);
+        handleSignInUp();
+      } catch (error) {
+        setIsAuthenticated(false);
+        console.error("Error fetching user data:", error);
+      }
+    } else {
+      console.log("not auth:", authStatus);
+    }
+
+    /*const listener = ({ payload: { event, data } }) => {
+      console.log("Auth event:", event);
+      switch (event) {
+        case "signedIn":
+          handleSignInUp();
+          break;
+        case "signedOut":
+          setIsAuthenticated(false);
+          break;
+        case "signedUp":
+          handleSignInUp();
+          break;
+        default:
+          break;
+      }
+    };
+    const unsubscribe = Hub.listen("auth", listener);
+    console.log("Hub not work if not inside message");
+    //handleSignInUp();
+    return () => unsubscribe();
+*/
+    /*Hub.listen("*", (data) => {
+      console.log("Any Hub event:", data);
+    });*/
+    //}, []);
+
+    /*useEffect(() => {
     async function getUserData() {
       try {
         //const user = await getCurrentUser();
@@ -59,8 +152,8 @@ function App() {
         console.log("Error fetching current user", error);
       }
     }
-    getUserData();
-  }, []);
+    getUserData();*/
+  }, [authStatus]);
 
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();

@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { signOut } from "@aws-amplify/auth";
 
 const AuthContext = createContext();
 
@@ -125,6 +126,7 @@ export const AuthProvider = ({ children }) => {
     setUserId("");
     setToken("");
     setUser("");
+    signOut();
     localStorage.clear();
   }, []);
 
@@ -274,11 +276,14 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        setIsAuthenticated,
         invalidLogin,
         invalidRegister,
         invalidForget,
         invalidResetPassword,
         userId,
+        setToken,
+        setUserId,
         login,
         logout,
         register,

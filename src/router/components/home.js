@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const Home = () => {
-  const { userId, token, user } = useAuth();
+  const { userId, token, user, setToken, setUserId } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
 
@@ -17,7 +17,8 @@ const Home = () => {
   useEffect(() => {
     const tn = query.get("token");
     const ur = query.get("userId");
-    if (tn && ur) {
+
+    if (tn && ur && !token && !userId) {
       fetch(`/api/verify-user?token=${tn}&userId=${ur}`, {
         method: "GET",
       })
@@ -29,21 +30,27 @@ const Home = () => {
           }
         });
     }
+    if (!token && !userId) {
+      setToken(tn);
+      setUserId(ur);
+    }
   }, []);
 
   useEffect(() => {
-    fetch(`/api/tasks?userId=${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        data.tasks && setTasks(data.tasks);
+    if (token) {
+      fetch(`/api/tasks?userId=${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .catch((error) => {
-        console.log(error.message);
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          data.tasks && setTasks(data.tasks);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
   }, [userId, token]);
 
   const handleAdd = useCallback(() => {
