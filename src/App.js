@@ -26,7 +26,12 @@ import { editing, dataFetcher } from "./actions";
 import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
-import { getCurrentUser, fetchUserAttributes } from "@aws-amplify/auth";
+import { useNavigate } from "react-router-dom";
+import {
+  getCurrentUser,
+  fetchUserAttributes,
+  signInWithRedirect,
+} from "@aws-amplify/auth";
 import {
   withAuthenticator,
   Authenticator,
@@ -49,6 +54,7 @@ function App() {
     password: "",
   });
 
+  const navigate = useNavigate();
   useEffect(() => {
     const handleSignInUp = async () => {
       try {
@@ -89,11 +95,11 @@ function App() {
         console.log("error in retrieving user: ", error);
       }
     };
-    //if (authStatus === "configuring") {
     if (authStatus === "authenticated") {
       try {
         if (!isAuthenticated) {
           setIsAuthenticated(true);
+          navigate(`/`);
           handleSignInUp();
         }
       } catch (error) {
