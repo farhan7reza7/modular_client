@@ -36,22 +36,26 @@ const Home = () => {
     }
   }, []);
 
+  const handleGet = useCallback(() => {
+    fetch(`/api/tasks?userId=${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        data.tasks && setTasks(data.tasks);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }, [userId, token]);
+
   useEffect(() => {
     if (token) {
-      fetch(`/api/tasks?userId=${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          data.tasks && setTasks(data.tasks);
-        })
-        .catch((error) => {
-          console.log(error.message);
-        });
+      handleGet();
     }
-  }, [userId, token]);
+  }, [handleGet, token]);
 
   const handleAdd = useCallback(() => {
     fetch("/api/task", {
@@ -63,25 +67,13 @@ const Home = () => {
       body: JSON.stringify({ content: input, userId: userId }),
     })
       .then((res) => {
-        fetch(`/api/tasks?userId=${userId}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            data.tasks && setTasks(data.tasks);
-          })
-          .catch((error) => {
-            console.log(error.message);
-          });
+        handleGet();
         setInput("");
       })
       .catch((error) => {
         console.log(error.message);
       });
-  }, [input, userId, token]);
+  }, [input, userId, token, handleGet]);
 
   return (
     <>
@@ -95,7 +87,7 @@ const Home = () => {
           </li>
         </ul>
       </nav>
-      <div className="component">
+      <div className="component" style={{ overflow: "auto" }}>
         Home page
         <div>
           <p>user id: {userId}</p>
@@ -113,6 +105,9 @@ const Home = () => {
             <br />
             <button type="button" onClick={handleAdd}>
               Add new
+            </button>
+            <button type="button" onClick={handleGet}>
+              Get Items
             </button>
           </form>
         </div>
