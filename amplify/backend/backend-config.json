@@ -1,6 +1,6 @@
 {
   "auth": {
-    "frontnewe2a889dd": {
+    "front55d8f75a": {
       "customAuth": false,
       "dependsOn": [],
       "frontendAuthConfig": {
@@ -21,8 +21,7 @@
           "AMAZON"
         ],
         "usernameAttributes": [
-          "EMAIL",
-          "PHONE_NUMBER"
+          "EMAIL"
         ],
         "verificationMechanisms": [
           "EMAIL"

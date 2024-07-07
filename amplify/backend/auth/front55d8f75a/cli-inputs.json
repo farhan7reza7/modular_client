@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "frontnewe2a889dd_identitypool_e2a889dd",
+    "identityPoolName": "front55d8f75a_identitypool_55d8f75a",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "frontne2a889dd",
-    "userPoolName": "frontnewe2a889dd_userpool_e2a889dd",
+    "resourceNameTruncated": "front55d8f75a",
+    "userPoolName": "front55d8f75a_userpool_55d8f75a",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -31,17 +31,17 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "frontne2a889dd_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "front555d8f75a_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "e2a889dd",
-    "resourceName": "frontnewe2a889dd",
+    "sharedId": "55d8f75a",
+    "resourceName": "front55d8f75a",
     "authSelections": "identityPoolAndUserPool",
     "useDefault": "defaultSocial",
     "hostedUI": true,
     "usernameAttributes": [
-      "email, phone_number"
+      "email"
     ],
-    "hostedUIDomainName": "frontnewe2a889dd-e2a889dd",
+    "hostedUIDomainName": "front55d8f75a-55d8f75a",
     "authProvidersUserPool": [
       "Facebook",
       "Google",
@@ -66,6 +66,6 @@
     },
     "breakCircularDependency": true,
     "dependsOn": [],
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://main.d2b65wp3mxn1jy.amplifyapp.com/\",\"http://localhost:3000/\",\"http://localhost:3000/\",\"https://social.d2b65wp3mxn1jy.amplifyapp.com/\"],\"LogoutURLs\":[\"https://main.d2b65wp3mxn1jy.amplifyapp.com/logout/\",\"http://localhost:3000/logout/\",\"https://social.d2b65wp3mxn1jy.amplifyapp.com/logout/\"]}"
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"https://main.d2b65wp3mxn1jy.amplifyapp.com/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"https://main.d2b65wp3mxn1jy.amplifyapp.com/\"]}"
   }
 }
