@@ -32,18 +32,20 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`/api/tasks?userId=${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        data.tasks && setTasks(data.tasks);
+    if (token) {
+      fetch(`/api/tasks?userId=${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .catch((error) => {
-        console.log(error.message);
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          data.tasks && setTasks(data.tasks);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
   }, [userId, token]);
 
   const handleAdd = useCallback(() => {

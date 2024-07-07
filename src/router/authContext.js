@@ -298,6 +298,9 @@ export const AuthProvider = ({ children }) => {
         user,
         invalidEmail,
         invalidMfa,
+        setIsAuthenticated,
+        setToken,
+        setUserId,
       }}
     >
       {children}

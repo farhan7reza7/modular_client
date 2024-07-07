@@ -28,8 +28,15 @@ import AppRoutes from "./router/appRoutes";
 import AppNavBar from "./router/appNavbar";
 
 import { getCurrentUser, fetchUserAttributes } from "@aws-amplify/auth";
-import { withAuthenticator, Authenticator } from "@aws-amplify/ui-react";
+import {
+  withAuthenticator,
+  Authenticator,
+  useAuthenticator,
+} from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+
+import { useAuth } from "./router/authContext";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({
@@ -38,29 +45,65 @@ function App() {
     id: "",
     password: "",
   });
+  const navigate = useNavigate();
+  const { logout, setToken, setUserId, setIsAuthenticated } = useAuth();
+
+  const { authStatus, user } = useAuthenticator((context) => [
+    context.authStatus,
+    context.user,
+  ]);
 
   useEffect(() => {
     async function getUserData() {
-      try {
-        //const user = await getCurrentUser();
-        const attributes = await fetchUserAttributes();
+      if (authStatus === "authenticated") {
+        try {
+          //const user = await getCurrentUser();
+          const attributes = await fetchUserAttributes();
 
-        if (attributes) {
-          //const attributes = await fetchUserAttributes(user);
-          setCurrentUser({
-            email: attributes.email,
-            id: attributes.sub || attributes.id || attributes.user_id,
-          });
-          console.log("okay status, should retrive");
-        } else {
-          console.log("user is not authenticcated");
+          if (attributes) {
+            //const attributes = await fetchUserAttributes(user);
+            const email = attributes.email;
+            const id = attributes.sub || attributes.id || attributes.user_id;
+
+            setCurrentUser({
+              email: email,
+              id: id,
+            });
+            console.log("okay status, should retrive");
+
+            fetch(`/api/current?email=${email}&id=${id}`, {
+              method: "GET",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.valid) {
+                  setIsAuthenticated(true);
+                  setToken(data.token);
+                  setUserId(data.userId);
+                  console.log("user set to retrive data");
+                  //navigate(`/?token=${data.token}&userId${data.userId}`);
+                } else {
+                  setIsAuthenticated(false);
+                  console.log("response fron server: ", data);
+                }
+              })
+              .catch((error) => {
+                console.log("error fron server: ", error);
+              });
+          } else {
+            console.log("user attrs are not accessible");
+          }
+        } catch (error) {
+          console.log("Error fetching current user attrs", error);
         }
-      } catch (error) {
-        console.log("Error fetching current user", error);
+      } else if (authStatus === "configuring") {
+        setIsAuthenticated(true);
+      } else {
+        console.log("user is not authenticcated");
       }
     }
     getUserData();
-  }, []);
+  }, [authStatus]);
 
   const ref1 = useSpringRef();
   const ref2 = useSpringRef();
@@ -176,7 +219,14 @@ const items = useSelector(itemsSelector);*/
             {user ? (
               <div>
                 <p>current user: {user.username}</p>
-                <button type="button" onClick={signOut}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    signOut();
+                    logout();
+                    setIsAuthenticated(false);
+                  }}
+                >
                   Sign out
                 </button>
               </div>
