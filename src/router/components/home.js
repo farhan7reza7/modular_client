@@ -88,7 +88,7 @@ const Home = () => {
           </li>
         </ul>
       </nav>
-      <div className="component">
+      <div className="component" style={{ overflow: "auto" }}>
         Home page
         <div>
           <p>user id: {userId}</p>
